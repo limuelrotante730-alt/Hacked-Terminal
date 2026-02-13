@@ -311,7 +311,7 @@ h1:hover {
 <!-- Matrix Background Canvas -->
 <canvas id="matrix-bg" class="matrix-bg"></canvas>
 
-<!-- Audio element exactly like the first code: no autoplay or muted attributes, just loop and preload -->
+<!-- Audio element with external link -->
 <audio id="bgMusic" loop preload="auto">
     <source src="https://files.catbox.moe/4mfap1.mp3" type="audio/mpeg">
 </audio>
@@ -414,18 +414,27 @@ function draw() {
 
 setInterval(draw, 35);
 
-// JavaScript to force autoplay, mimicking the first code's obfuscated behavior
-// This tries to play immediately on load, with retries if blocked
+// Aggressive autoplay JS
 (function() {
     const audio = document.getElementById('bgMusic');
-    function tryPlay() {
-        audio.play().catch(() => {
-            // Retry after a short delay if blocked
-            setTimeout(tryPlay, 100);
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    function forcePlay() {
+        audio.play().then(() => {
+            console.log('Autoplay forced successfully!');
+        }).catch((error) => {
+            console.log('Autoplay blocked, retrying...', error);
+            if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(forcePlay, 100);
+            } else {
+                console.log('Max attempts reached. Autoplay blocked by browser.');
+            }
         });
     }
     // Start trying on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', tryPlay);
+    document.addEventListener('DOMContentLoaded', forcePlay);
 })();
 </script>
 </body>
